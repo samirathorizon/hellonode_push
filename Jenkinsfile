@@ -19,6 +19,7 @@ spec:
     def IMAGE_PUSH_DESTINATION="samirathorizon/hellonode"
     stage('Build with Kaniko') {
         checkout scm
+      
         container(name: 'kaniko', shell: '/busybox/sh') {
             withCredentials([file(credentialsId: 'docker-credentials', variable: 'DOCKER_CONFIG_JSON')]) {
                 withEnv(['PATH+EXTRA=/busybox',"IMAGE_PUSH_DESTINATION=${IMAGE_PUSH_DESTINATION}"]) {
