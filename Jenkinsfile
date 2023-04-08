@@ -16,7 +16,7 @@ spec:
     tty: true
 '''){
   node(label) {
-    def IMAGE_PUSH_DESTINATION="kyounger/kaniko-jenkins:jenkins-secret"
+    def IMAGE_PUSH_DESTINATION="samirathorizon/hellonode"
     stage('Build with Kaniko') {
         checkout scm
         container(name: 'kaniko', shell: '/busybox/sh') {
