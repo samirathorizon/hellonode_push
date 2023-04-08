@@ -15,7 +15,7 @@ spec:
      - /busybox/cat
     tty: true
 '''){
-  node(label) {
+  node(POD_LABEL) {
     def IMAGE_PUSH_DESTINATION="samirathorizon/hellonode"
     stage('Build with Kaniko') {
         checkout scm
