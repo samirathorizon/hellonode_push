@@ -1,4 +1,3 @@
-    
 podTemplate(yaml: '''
 kind: Pod
 metadata:
@@ -6,7 +5,7 @@ metadata:
   namespace: ali
 spec:
   containers:
-  - name: shell
+  - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: IfNotPresent
     env:
@@ -16,14 +15,20 @@ spec:
      - /busybox/cat
     tty: true
 '''){
-  node(POD_LABEL) {
-     stage('Build') {
-      git 'https://github.com/samirathorizon/hellonode.git'
-      container('shell') {
-        stage('Build a Maven project') {
-           sh '/kaniko/executor  --context `pwd` --destination=hellonode --no-push'
+  node(label) {
+    def IMAGE_PUSH_DESTINATION="kyounger/kaniko-jenkins:jenkins-secret"
+    stage('Build with Kaniko') {
+        checkout scm
+        container(name: 'kaniko', shell: '/busybox/sh') {
+            withCredentials([file(credentialsId: 'docker-credentials', variable: 'DOCKER_CONFIG_JSON')]) {
+                withEnv(['PATH+EXTRA=/busybox',"IMAGE_PUSH_DESTINATION=${IMAGE_PUSH_DESTINATION}"]) {
+                    sh '''#!/busybox/sh
+                        cp $DOCKER_CONFIG_JSON /kaniko/.docker/config.json
+                        /kaniko/executor --context `pwd` --destination $IMAGE_PUSH_DESTINATION
+                    '''
+                }
+            }
         }
       }
     }
-}
-}
+  }   
